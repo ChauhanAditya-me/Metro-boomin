@@ -1,0 +1,12 @@
+debug/main.o
+debug/MetroData.o
+debug/RouteCalculator.o
+debug/MetroMapView.o
+debug/MetroPlannerWindow.o
+debug/Chatbot.o
+debug/SettingsDialog.o
+debug/Visualization.o
+debug/moc_MetroMapView.o
+debug/moc_MetroPlannerWindow.o
+debug/moc_Chatbot.o
+debug/moc_SettingsDialog.o

@@ -1,0 +1,12 @@
+release/main.o
+release/MetroData.o
+release/RouteCalculator.o
+release/MetroMapView.o
+release/MetroPlannerWindow.o
+release/Chatbot.o
+release/SettingsDialog.o
+release/Visualization.o
+release/moc_MetroMapView.o
+release/moc_MetroPlannerWindow.o
+release/moc_Chatbot.o
+release/moc_SettingsDialog.o
