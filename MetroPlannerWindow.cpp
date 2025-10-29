@@ -12,7 +12,7 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
-#include <algorithm> /* Needed for std::find */
+#include <algorithm>
 #include <cmath>
 #include <climits>
 #include "Chatbot.h"
@@ -20,7 +20,6 @@
 
 using namespace std;
 
-/* Implementation of MetroPlannerWindow members */
 MetroPlannerWindow::MetroPlannerWindow(QWidget *parent) : QMainWindow(parent)
 {
     setWindowTitle("Metro Route Optimizer");
@@ -31,12 +30,10 @@ MetroPlannerWindow::MetroPlannerWindow(QWidget *parent) : QMainWindow(parent)
 
     auto *mainLayout = new QHBoxLayout(centralWidget);
 
-    /* Left panel for controls */
     auto *controlsPanel = new QWidget;
     auto *controlsLayout = new QVBoxLayout(controlsPanel);
     controlsPanel->setMaximumWidth(400);
 
-    /* Station selection group */
     auto *stationGroup = new QGroupBox("Plan Your Journey");
     auto *stationLayout = new QVBoxLayout(stationGroup);
 
@@ -54,22 +51,19 @@ MetroPlannerWindow::MetroPlannerWindow(QWidget *parent) : QMainWindow(parent)
     toLayout->addWidget(toStation);
 
     auto *swapBtn = new QPushButton;
-    /* Create a custom icon with two separate arrows side by side with the color #3B9CFF */
     QIcon swapIcon;
     QPixmap pixmap(32, 24);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     painter.setPen(QPen(QColor(0x3B9CFF), 2));
 
-    /* Draw up arrow on the left side */
-    painter.drawLine(8, 18, 8, 4); /* Vertical line for up arrow */
-    painter.drawLine(3, 9, 8, 4);  /* Left side of up arrow head */
-    painter.drawLine(13, 9, 8, 4); /* Right side of up arrow head */
+    painter.drawLine(8, 18, 8, 4); 
+    painter.drawLine(3, 9, 8, 4);  
+    painter.drawLine(13, 9, 8, 4); 
 
-    /* Draw down arrow on the right side */
-    painter.drawLine(24, 4, 24, 18);  /* Vertical line for down arrow */
-    painter.drawLine(19, 13, 24, 18); /* Left side of down arrow head */
-    painter.drawLine(29, 13, 24, 18); /* Right side of down arrow head */
+    painter.drawLine(24, 4, 24, 18); 
+    painter.drawLine(19, 13, 24, 18);
+    painter.drawLine(29, 13, 24, 18);
 
     painter.end();
     swapIcon.addPixmap(pixmap);
@@ -87,13 +81,11 @@ MetroPlannerWindow::MetroPlannerWindow(QWidget *parent) : QMainWindow(parent)
     stationLayout->addWidget(holidayCheck);
     stationLayout->addWidget(metroCardCheck);
 
-    /* Route details without background styling */
     routeDetails = new QTextEdit;
     routeDetails->setReadOnly(true);
     routeDetails->setMinimumHeight(250);
     routeDetails->setStyleSheet("QTextEdit { border: 1px solid #ddd; border-radius: 4px; }");
 
-    /* Find route button */
     findRouteBtn = new QPushButton("Find Route");
     findRouteBtn->setStyleSheet("background-color: #3b82f6; color: white; padding: 10px;");
     connect(findRouteBtn, &QPushButton::clicked, this, &MetroPlannerWindow::findRoute);
@@ -102,7 +94,6 @@ MetroPlannerWindow::MetroPlannerWindow(QWidget *parent) : QMainWindow(parent)
     controlsLayout->addWidget(routeDetails);
     controlsLayout->addWidget(findRouteBtn);
 
-    /* Chat assistant UI */
     chatbot = new Chatbot(this);
 
     chatHistory = new QTextEdit;
@@ -135,13 +126,11 @@ MetroPlannerWindow::MetroPlannerWindow(QWidget *parent) : QMainWindow(parent)
     connect(chatbot, &Chatbot::routeRequested, this, &MetroPlannerWindow::handleRouteRequest);
     controlsLayout->addStretch();
 
-    /* Map view */
     mapView = new MetroMapView;
 
     mainLayout->addWidget(controlsPanel);
     mainLayout->addWidget(mapView);
 
-    /* Initialize the map */
     initializeGraph();
     drawMetroMap();
 }
@@ -165,11 +154,9 @@ void MetroPlannerWindow::findRoute()
         return;
     }
 
-    /* Get the actual station IDs */
     int startId = stationMap[fromStation->currentText().toStdString()].id;
     int endId = stationMap[toStation->currentText().toStdString()].id;
 
-    /* Compute the shortest path */
     vector<int> distances, previous;
     dijkstra(startId, graph, distances, previous);
 
@@ -179,26 +166,21 @@ void MetroPlannerWindow::findRoute()
         return;
     }
 
-    /* Reconstruct the path */
     vector<int> path = reconstructPath(startId, endId, previous, stations);
 
-    /* Calculate distance and fare */
     double totalDistance = calculatePathDistance(path, graph);
     int baseFare = calculateFare(totalDistance, holidayCheck->isChecked());
 
-    /* Generate HTML route information using the Visualization module */
     QString routeInfoHTML = getRouteHTML(
         path, stations, distances[endId], totalDistance, baseFare,
         holidayCheck->isChecked(), metroCardCheck->isChecked());
 
     routeDetails->setHtml(routeInfoHTML);
 
-    /* Extract unique path for highlighting (same logic as in getRouteHTML) */
     vector<vector<string>> path_lines;
     vector<string> station_names;
     vector<int> unique_path;
 
-    /* Create a unique path without duplicate station names */
     for (int idx : path)
     {
         if (station_names.empty() || stations[idx].name != station_names.back())
@@ -209,7 +191,6 @@ void MetroPlannerWindow::findRoute()
         }
     }
 
-    /* Redraw the map with the highlighted path */
     drawMetroMap();
     mapView->highlightPath(unique_path, stations);
 }
@@ -222,14 +203,12 @@ void MetroPlannerWindow::sendChat()
     chatHistory->append(QString("<b>You:</b> %1").arg(prompt));
     chatInput->clear();
 
-    /* Use local mode by default (empty API key). To enable remote LLM, pass a key. */
     chatbot->ask(prompt, QString());
 }
 
 void MetroPlannerWindow::onChatResponse(const QString &response)
 {
     chatHistory->append(QString("<b>Assistant:</b> %1").arg(response));
-    /* Optionally parse response and trigger actions (not implemented here). */
 }
 
 void MetroPlannerWindow::openSettings()
@@ -262,7 +241,6 @@ static int levenshteinDistance(const std::string &s1, const std::string &s2)
 
 void MetroPlannerWindow::handleRouteRequest(const QString &fromRaw, const QString &toRaw)
 {
-    // Normalize inputs
     auto normalize = [](const QString &s) {
         QString t = s.toLower().trimmed();
         return t;
@@ -271,7 +249,6 @@ void MetroPlannerWindow::handleRouteRequest(const QString &fromRaw, const QStrin
     QString from = normalize(fromRaw);
     QString to = normalize(toRaw);
 
-    // Helper to find best matching station name from stationMap
     auto findBestMatch = [&](const QString &query) -> QString {
         if (query.isEmpty()) return QString();
 
@@ -280,10 +257,8 @@ void MetroPlannerWindow::handleRouteRequest(const QString &fromRaw, const QStrin
         for (const auto &p : stationMap)
         {
             std::string candidate = p.first;
-            // compare lowercase
             QString candQ = QString::fromStdString(candidate).toLower();
             if (candQ == query) return QString::fromStdString(candidate);
-            // if contains, prefer it
             if (candQ.contains(query)) return QString::fromStdString(candidate);
 
             int dist = levenshteinDistance(std::string(query.toStdString()), candidate);
@@ -293,10 +268,8 @@ void MetroPlannerWindow::handleRouteRequest(const QString &fromRaw, const QStrin
                 bestName = candidate;
             }
         }
-        // Accept match if reasonably close
         if (bestDist <= 4 && !bestName.empty())
             return QString::fromStdString(bestName);
-        // fallback: return empty
         return QString();
     };
 
@@ -309,22 +282,18 @@ void MetroPlannerWindow::handleRouteRequest(const QString &fromRaw, const QStrin
         return;
     }
 
-    // Set comboboxes
     int idxFrom = fromStation->findText(bestFrom, Qt::MatchExactly);
     int idxTo = toStation->findText(bestTo, Qt::MatchExactly);
     if (idxFrom != -1) fromStation->setCurrentIndex(idxFrom);
     if (idxTo != -1) toStation->setCurrentIndex(idxTo);
 
-    // Trigger route calculation
     findRoute();
 }
 
 void MetroPlannerWindow::initializeStations()
 {
-    /* Use the centralized function from MetroData to initialize stations and graph */
     initializeMetroNetwork(stations, graph);
 
-    /* Set visualization coordinates for each station */
     /* Blue Line (Major stations) */
     stations[0].x = 50;
     stations[0].y = 300; /* Dwarka Sec-21 */
@@ -401,7 +370,6 @@ void MetroPlannerWindow::initializeStations()
     stations[32].x = 750;
     stations[32].y = 350; /* Botanical Garden */
 
-    /* Build station map for quick lookup */
     for (const auto &station : stations)
     {
         stationMap[station.name] = station;
@@ -410,7 +378,6 @@ void MetroPlannerWindow::initializeStations()
 
 void MetroPlannerWindow::populateStationCombos()
 {
-    /* Sort station names alphabetically */
     vector<string> stationNames;
     for (const auto &pair : stationMap)
     {
@@ -418,7 +385,6 @@ void MetroPlannerWindow::populateStationCombos()
     }
     sort(stationNames.begin(), stationNames.end());
 
-    /* Populate comboboxes */
     for (const auto &name : stationNames)
     {
         fromStation->addItem(QString::fromStdString(name));
@@ -428,14 +394,12 @@ void MetroPlannerWindow::populateStationCombos()
 
 void MetroPlannerWindow::initializeGraph()
 {
-    /* This function is empty as we're now using initializeMetroNetwork in initializeStations */
 }
 
 void MetroPlannerWindow::drawMetroMap()
 {
     mapView->clearRoute();
 
-    /* Draw Blue Line */
     for (int i = 0; i < 8; i++)
     {
         mapView->drawLine(
@@ -444,7 +408,6 @@ void MetroPlannerWindow::drawMetroMap()
             "Blue");
     }
 
-    /* Draw Yellow Line */
     for (int i = 9; i < 18; i++)
     {
         mapView->drawLine(
@@ -453,7 +416,6 @@ void MetroPlannerWindow::drawMetroMap()
             "Yellow");
     }
 
-    /* Draw Red Line */
     for (int i = 19; i < 22; i++)
     {
         mapView->drawLine(
@@ -462,7 +424,6 @@ void MetroPlannerWindow::drawMetroMap()
             "Red");
     }
 
-    /* Draw Pink Line */
     for (int i = 23; i < 28; i++)
     {
         mapView->drawLine(
@@ -471,7 +432,6 @@ void MetroPlannerWindow::drawMetroMap()
             "Pink");
     }
 
-    /* Draw Magenta Line */
     for (int i = 29; i < 32; i++)
     {
         mapView->drawLine(
@@ -480,7 +440,6 @@ void MetroPlannerWindow::drawMetroMap()
             "Magenta");
     }
 
-    /* Draw all stations */
     for (const auto &station : stations)
     {
         mapView->drawStation(

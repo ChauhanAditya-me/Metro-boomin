@@ -17,7 +17,6 @@ void dijkstra(int start, const vector<vector<Edge>> &graph,
 
     for (int i = 0; i < n; i++)
     {
-        /* Find the unvisited node with minimum distance */
         int minDist = INT_MAX;
         int current = -1;
 
@@ -31,11 +30,10 @@ void dijkstra(int start, const vector<vector<Edge>> &graph,
         }
 
         if (current == -1)
-            break; /* No reachable unvisited nodes */
+            break; 
 
         visited[current] = true;
 
-        /* Update distances to neighbors */
         for (const Edge &edge : graph[current])
         {
             int next = edge.destination;
@@ -62,7 +60,6 @@ vector<int> reconstructPath(int start, int end, const vector<int> &previous,
 
     if (path[0] == start)
     {
-        /* Remove duplicate stations with the same name if needed */
         vector<int> unique_path;
         unordered_set<string> seen_names;
 
@@ -78,12 +75,11 @@ vector<int> reconstructPath(int start, int end, const vector<int> &previous,
         return unique_path;
     }
 
-    return {}; /* Return empty if no path exists */
+    return {}; 
 }
 
 int calculateFare(double distance, bool isHoliday)
 {
-    /* Delhi Metro fare structure based on distance */
     if (distance <= 2)
         return 10;
     if (distance <= 5)

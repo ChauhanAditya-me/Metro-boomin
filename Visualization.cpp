@@ -35,13 +35,11 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
         return "No valid route found.";
     }
 
-    /* Calculate final fare with metro card discount if applicable */
     int finalFare = fare;
     bool hasDiscount = false;
 
     if (hasMetroCard)
     {
-        /* Apply 10% discount for metro card */
         finalFare = static_cast<int>(ceil(fare * 0.9));
         hasDiscount = true;
     }
@@ -49,20 +47,16 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
     int startId = path.front();
     int endId = path.back();
 
-    /* Format the route details using HTML for better styling */
     QString routeInfoHTML = QString("<html><body style='font-family: Arial;'>");
 
-    /* Header - Route title with larger font */
     routeInfoHTML += QString("<div style='margin-bottom: 8px;'>"
                              "<span style='font-size: 16px; font-weight: bold;'>Route from %1 to %2</span>"
                              "</div>")
                          .arg(QString::fromStdString(stations[startId].name))
                          .arg(QString::fromStdString(stations[endId].name));
 
-    /* Journey details with text-based styling */
     routeInfoHTML += "<div style='margin: 10px 0; padding: 5px;'>";
 
-    /* Time and distance info with larger text */
     routeInfoHTML += QString("<div style='margin-bottom: 5px;'>"
                              "<span style='font-weight: bold; color: #3b82f6;'>Time:</span> "
                              "<span style='font-size: 15px;'>%1 minutes</span>"
@@ -75,11 +69,9 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
                              "</div>")
                          .arg(QString::number(totalDistance, 'f', 2));
 
-    /* Fare info with prominent text styling and discount information */
     routeInfoHTML += QString("<div style='margin: 8px 0;'>"
                              "<span style='font-weight: bold; color: #10b981;'>Fare:</span> ");
 
-    /* Show original fare and discounted fare if there's a discount */
     if (hasDiscount)
     {
         routeInfoHTML += QString("<span style='font-size: 15px; text-decoration: line-through; color: #666;'>₹%1</span> ")
@@ -94,7 +86,6 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
                              .arg(finalFare);
     }
 
-    /* Add holiday information if applicable */
     if (isHoliday)
     {
         routeInfoHTML += " <span style='font-size: 12px; color: #10b981;'>(Holiday rate)</span>";
@@ -102,15 +93,12 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
 
     routeInfoHTML += "</div>";
 
-    /* Path header with bold text and more visible color */
     routeInfoHTML += "<span style='font-size: 16px; font-weight: bold; color: #FF5500;'>Path:</span>";
 
-    /* Prepare lines info for each station in the path */
     vector<vector<string>> path_lines;
     vector<string> station_names;
     vector<int> unique_path;
 
-    /* Create a unique path without duplicate station names */
     for (int idx : path)
     {
         if (station_names.empty() || stations[idx].name != station_names.back())
@@ -122,7 +110,6 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
     }
 
     string current_line = path_lines[0][0];
-    /* Try to pick a line that continues to the next station */
     if (unique_path.size() > 1)
     {
         for (const string &l : path_lines[0])
@@ -135,7 +122,6 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
         }
     }
 
-    /* Start station with styled line text */
     routeInfoHTML += "<p style='margin: 8px 0;'><b>1. Start at</b> " +
                      QString::fromStdString(stations[unique_path[0]].name) + " [";
 
@@ -155,11 +141,8 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
     int step = 2;
     for (size_t i = 1; i < unique_path.size(); i++)
     {
-        /* Check if current_line is present at this station */
         if (find(path_lines[i].begin(), path_lines[i].end(), current_line) == path_lines[i].end())
         {
-            /* Need to change line */
-            /* Find a new line that is present in both previous and current station */
             string new_line = path_lines[i][0];
             for (const string &l : path_lines[i])
             {
@@ -170,7 +153,6 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
                 }
             }
 
-            /* Line change notification with colored text */
             QString lineColor = getLineColorHTML(new_line);
 
             routeInfoHTML += QString("<p style='margin: 8px 0; padding: 5px;'>"
@@ -183,7 +165,6 @@ QString getRouteHTML(const vector<int> &path, const vector<Station> &stations,
             current_line = new_line;
         }
 
-        /* Regular station with line text */
         routeInfoHTML += QString("<p style='margin: 8px 0;'><b>%1. →</b> %2 [")
                              .arg(step++)
                              .arg(QString::fromStdString(stations[unique_path[i]].name));

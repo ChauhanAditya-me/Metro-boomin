@@ -34,7 +34,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
     btnLayout->addWidget(cancelBtn);
     mainLayout->addLayout(btnLayout);
 
-    /* Load existing settings */
     QSettings settings;
     apiKeyEdit->setText(settings.value("Chatbot/apiKey").toString());
     enableRemoteCheck->setChecked(settings.value("Chatbot/enableRemote", false).toBool());

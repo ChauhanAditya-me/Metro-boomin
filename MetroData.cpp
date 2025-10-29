@@ -4,7 +4,6 @@
 
 using namespace std;
 
-// Helper function to split lines by '/'
 vector<string> splitLines(const string &lines)
 {
     vector<string> result;
@@ -16,14 +15,12 @@ vector<string> splitLines(const string &lines)
         start = end + 1;
     }
 
-    /* Include the last segment */
     result.push_back(lines.substr(start));
     return result;
 }
 
 void initializeMetroNetwork(vector<Station> &stations, vector<vector<Edge>> &graph)
 {
-    /* Define Delhi Metro stations with default visualization coordinates */
     stations = {
         /* Blue Line (Major stations) */
         {0, "Dwarka Sec-21", "Blue", 0.0, 0.0},
@@ -71,7 +68,6 @@ void initializeMetroNetwork(vector<Station> &stations, vector<vector<Edge>> &gra
     int n = stations.size();
     graph.resize(n);
 
-    /* Helper function to add bidirectional edge */
     auto addEdge = [&](int from, int to, int time, double dist)
     {
         graph[from].push_back({to, time, dist});
@@ -81,7 +77,7 @@ void initializeMetroNetwork(vector<Station> &stations, vector<vector<Edge>> &gra
     /* Blue Line connections */
     for (int i = 0; i < 8; ++i)
     {
-        addEdge(i, i + 1, 5, 2.5); /* 2.5 KM between stations average */
+        addEdge(i, i + 1, 5, 2.5); 
     }
 
     /* Yellow Line connections */

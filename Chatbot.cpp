@@ -20,7 +20,6 @@ void Chatbot::ask(const QString &prompt, const QString &apiKey)
     QString lower = prompt.toLower();
     QString key = apiKey;
 
-    /* If the caller didn't provide an API key, try QSettings */
     if (key.isEmpty())
     {
         QSettings settings;
@@ -40,7 +39,6 @@ void Chatbot::ask(const QString &prompt, const QString &apiKey)
         return;
     }
 
-    /* Detect natural language route requests like "route from X to Y" or "from X to Y" */
     QRegularExpression re("(?:route\\s+)?from\\s+([\\w\\s-]+?)\\s+(?:to|2)\\s+([\\w\\s-]+)", QRegularExpression::CaseInsensitiveOption);
     auto match = re.match(prompt);
     if (match.hasMatch())
@@ -57,7 +55,6 @@ void Chatbot::ask(const QString &prompt, const QString &apiKey)
 
     if (!key.isEmpty())
     {
-        // Example skeleton for remote call. Replace endpoint and model per provider.
         QUrl url("https://api.openai.com/v1/chat/completions");
         QNetworkRequest request(url);
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
